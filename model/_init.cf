@@ -1,0 +1,68 @@
+import ip::services
+import exec
+import yum
+
+entity PostgresqlServer extends ip::services::Server:
+    # Nothing
+end
+
+PostgresqlServer.databases [0:] -- Database.server [1]
+PostgresqlServer.users [0:] -- User.server [1]
+
+implement PostgresqlServer using postgresqlServer
+
+implementation postgresqlServer for PostgresqlServer:
+    postgresql_repo = yum::Repository(host=self.host,
+                                      name="postgresql-10",
+                                      gpgcheck=true,
+                                      enabled=true,
+                                      baseurl="https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-$releasever-$basearch",
+                                      gpgkey="https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG",
+                                      requires=self.requires)
+    install_postgresql_package = std::Package(name="postgresql10-server", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_contrib_package = std::Package(name="postgresql10-contrib", host=self.host, state="latest", requires=[postgresql_repo])
+    postgresql_initdb_script = exec::Run(host=self.host,
+                                        creates="/var/lib/pgsql/10/data/pg_hba.conf",
+                                        command=exec::in_shell("sudo su -c '/usr/pgsql-10/bin/initdb /var/lib/pgsql/10/data' - postgres"),
+                                        requires=[install_postgresql_contrib_package, install_postgresql_package])
+    postgresql_pg_hba_file = std::File(host=self.host,
+                                    path="/var/lib/pgsql/10/data/pg_hba.conf",
+                                    mode=600,
+                                    owner="postgres",
+                                    group="postgres",
+                                    content=std::template('postgresql/pg_hba.conf.j2'),
+                                    requires=[postgresql_initdb_script],
+                                    reload=true)
+    postgresql_conf_file = std::File(host=self.host,
+                                    path="/var/lib/pgsql/10/data/postgresql.conf",
+                                    mode=600,
+                                    owner="postgres",
+                                    group="postgres",
+                                    content=std::template('postgresql/postgresql.conf.j2'),
+                                    requires=[postgresql_initdb_script],
+                                    reload=true)
+    postgresql_service = std::Service(name="postgresql-10", host=self.host, state="running", onboot=true,
+                                    requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script], provides=self.provides)
+
+end
+
+
+entity User extends std::PurgeableResource:
+    string username
+    string password
+end
+
+index User(username)
+
+implement User using std::none
+
+
+entity Database extends std::PurgeableResource:
+    string db_name
+end
+
+index Database(db_name)
+
+Database.owner [1] -- User
+
+implement Database using std::none
