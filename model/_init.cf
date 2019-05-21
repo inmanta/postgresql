@@ -52,7 +52,7 @@ entity User extends std::PurgeableResource:
     string password
 end
 
-index User(username)
+index User(server, username)
 
 implement User using std::none
 
@@ -61,7 +61,7 @@ entity Database extends std::PurgeableResource:
     string db_name
 end
 
-index Database(db_name)
+index Database(server, db_name)
 
 Database.owner [1] -- User
 
