@@ -46,7 +46,7 @@ class PSQLProvider(CRUDHandler):
 class DatabaseProvider(PSQLProvider):
 
     def read_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        results = self.execute_sql(ctx,f"SELECT pg_catalog.pg_get_userbyid(datdba) FROM pg_database WHERE datname = '{resource.db_name }'")
+        results = self.execute_sql(ctx, f"SELECT pg_catalog.pg_get_userbyid(datdba) FROM pg_database WHERE datname = '{resource.db_name }'")
         if not results:
             raise ResourcePurged()
         if not len(results) == 1:

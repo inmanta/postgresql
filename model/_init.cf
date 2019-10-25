@@ -53,7 +53,7 @@ end
 
 
 entity User extends std::PurgeableResource:
-    t_username username
+    username_t username
     string password
 end
 
