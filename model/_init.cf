@@ -2,14 +2,19 @@ import ip::services
 import exec
 import yum
 
+# can not be uppercase
+typedef username_t as string matching /[a-z0-9]*/
+
 entity PostgresqlServer extends ip::services::Server:
     # Nothing
+    bool managed = true
 end
 
 PostgresqlServer.databases [0:] -- Database.server [1]
 PostgresqlServer.users [0:] -- User.server [1]
 
-implement PostgresqlServer using postgresqlServer
+implement PostgresqlServer using postgresqlServer when managed
+implement PostgresqlServer using std::none when not managed
 
 implementation postgresqlServer for PostgresqlServer:
     postgresql_repo = yum::Repository(host=self.host,
@@ -48,13 +53,17 @@ end
 
 
 entity User extends std::PurgeableResource:
-    string username
+    username_t username
     string password
 end
 
 index User(server, username)
 
-implement User using std::none
+implement User using user_requires
+
+implementation user_requires for User:
+    self.requires = self.server
+end
 
 
 entity Database extends std::PurgeableResource:
@@ -65,4 +74,9 @@ index Database(server, db_name)
 
 Database.owner [1] -- User
 
-implement Database using std::none
+implement Database using db_requires
+
+implementation db_requires for Database:
+    self.requires = self.server
+    self.requires = self.owner
+end
