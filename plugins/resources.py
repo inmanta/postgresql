@@ -12,18 +12,16 @@
     Contact: code@inmanta.com
 """
 
-import psycopg2
-
 from inmanta.agent.handler import provider, CRUDHandler, ResourcePurged, HandlerContext
 from inmanta.resources import Resource, resource, PurgeableResource
 
 @resource("postgresql::Database", agent="server.host.name", id_attribute="db_name")
 class Database(Resource):
 
-    fields = ("db_name", "username", "purged", "purge_on_delete")
+    fields = ("db_name", "owner", "purged", "purge_on_delete")
 
     @staticmethod
-    def get_username(exp, obj):
+    def get_owner(exp, obj):
         try:
             if not obj.owner.username:
                 raise IgnoreResourceException()
@@ -32,35 +30,40 @@ class Database(Resource):
         return obj.owner.username
 
 
+class PSQLProvider(CRUDHandler):
+
+    def execute_sql(self, ctx: HandlerContext, cmd:str):
+        cmd = ["-u", "postgres", "--", "psql", "-q", "-t", "-A", "-z", "-c", cmd]
+        out, err, code = self._io.run("sudo", cmd, cwd="/")
+        ctx.info("ran command sudo %(cmd)s, return code %(code)d", cmd = cmd, code=code, out=out, err=err)
+        if code != 0:
+            raise Exception("Command returned non zero exit code\n" +  err)
+        return [record for record in (line.split('\0') for line in out.split("\n") if line) if record]
+
+
 
 @provider("postgresql::Database", name="postgresql-database")
-class DatabaseProvider(CRUDHandler):
+class DatabaseProvider(PSQLProvider):
 
     def read_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        conn = psycopg2.connect("dbname='postgres' user='postgres'")
-        try:
-            cur = conn.cursor()
-            cur.execute(f"SELECT 1 FROM pg_database WHERE datname = '{resource.db_name }'")
-            rows = cur.fetchall()
-            if not rows:
-                raise ResourcePurged()
-        finally:
-            conn.close()
+        results = self.execute_sql(ctx,f"SELECT pg_catalog.pg_get_userbyid(datdba) FROM pg_database WHERE datname = '{resource.db_name }'")
+        if not results:
+            raise ResourcePurged()
+        if not len(results) == 1:
+            raise Exception("Found multiple databases with the same name")
+        rec = results[0]
+        resource.owner = rec[0]
+        
 
     def create_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        conn = psycopg2.connect("dbname='postgres' user='postgres'")
-        try:
-            conn.autocommit = True
-            cur = conn.cursor()
-            cur.execute(f"CREATE DATABASE { resource.db_name } WITH OWNER='{ resource.username }'")
-        finally:
-            conn.close()
+        self.execute_sql(ctx, f"CREATE DATABASE { resource.db_name } WITH OWNER='{ resource.owner }'")
 
     def delete_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        pass
+        self.execute_sql(ctx, f"DROP DATABASE { resource.db_name }")
 
     def update_resource(self, ctx: HandlerContext, changes: dict, resource: PurgeableResource) -> None:
-        pass
+         self.execute_sql(ctx, f"ALTER DATABASE { resource.db_name } OWNER TO { resource.owner }")
+
 
 @resource("postgresql::User", agent="server.host.name", id_attribute="username")
 class User(Resource):
@@ -69,30 +72,18 @@ class User(Resource):
 
 
 @provider("postgresql::User", name="postgresql-user")
-class UserProvider(CRUDHandler):
+class UserProvider(PSQLProvider):
 
     def read_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        conn = psycopg2.connect("dbname='postgres' user='postgres'")
-        try:
-            cur = conn.cursor()
-            cur.execute(f"SELECT 1 FROM pg_user WHERE usename = '{ resource.username }'")
-            rows = cur.fetchall()
-            if not rows:
-                raise ResourcePurged()
-        finally:
-            conn.close()
+        records = self.execute_sql(ctx, f"SELECT 1 FROM pg_user WHERE usename = '{ resource.username }'")
+        if not records:
+            raise ResourcePurged()
 
     def create_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        conn = psycopg2.connect("dbname='postgres' user='postgres'")
-        try:
-            conn.autocommit = True
-            cur = conn.cursor()
-            cur.execute(f"CREATE USER { resource.username } WITH PASSWORD '{ resource.password }'")
-        finally:
-            conn.close()
+        self.execute_sql(ctx, f"CREATE USER { resource.username } WITH PASSWORD '{ resource.password }'")
 
     def delete_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        pass
+        self.execute_sql(ctx, f"DROP USER { resource.username }")
 
     def update_resource(self, ctx: HandlerContext, changes: dict, resource: PurgeableResource) -> None:
-        pass
+        raise Exception("Not supported")
