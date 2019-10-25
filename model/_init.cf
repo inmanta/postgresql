@@ -3,7 +3,7 @@ import exec
 import yum
 
 # can not be uppercase
-typedef t_username as string matching /[a-z0-9]*/
+typedef username_t as string matching /[a-z0-9]*/
 
 entity PostgresqlServer extends ip::services::Server:
     # Nothing
