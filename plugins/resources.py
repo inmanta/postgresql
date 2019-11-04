@@ -16,7 +16,7 @@ from inmanta.agent.handler import provider, CRUDHandler, ResourcePurged, Handler
 from inmanta.resources import Resource, resource, PurgeableResource
 
 @resource("postgresql::Database", agent="server.host.name", id_attribute="db_name")
-class Database(Resource):
+class Database(PurgeableResource):
 
     fields = ("db_name", "owner", "purged", "purge_on_delete")
 
@@ -66,7 +66,7 @@ class DatabaseProvider(PSQLProvider):
 
 
 @resource("postgresql::User", agent="server.host.name", id_attribute="username")
-class User(Resource):
+class User(PurgeableResource):
 
     fields = ("username", "password", "purged", "purge_on_delete")
 
