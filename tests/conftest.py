@@ -7,13 +7,7 @@ from pathlib import Path
 from pytest import fixture
 
 
-@fixture(scope="session", autouse=True)
-def postgres_docker_container():
-    # If "PG_TEST_HOST" is set, no need for a docker container
-    if os.getenv("PG_TEST_HOST"):
-        yield
-
-    # Run before the other session-scoped fixtures, like the project_factory in pytest-inmanta
+def start_container():
     image_name = f"test-module-postgres-{uuid.uuid4()}"
     subprocess.run(
         ["sudo", "docker", "build", ".", "-t", image_name,], check=True,
@@ -24,7 +18,6 @@ def postgres_docker_container():
                 "sudo",
                 "docker",
                 "run",
-                "--privileged",
                 "--expose=22",
                 "--rm",
                 "-d",
@@ -62,17 +55,17 @@ def postgres_docker_container():
         ],
         check=True,
     )
-    yield container_id
+    return container_id
+
+
+def stop_container(container_id: str):
     subprocess.run(["sudo", "docker", "stop", container_id], check=True)
 
 
-@fixture
-def pg_host(postgres_db, postgres_docker_container):
-    if os.getenv("PG_TEST_HOST"):
-        return os.getenv("PG_TEST_HOST")
+def get_ip_of_container(container_id):
     inspect_output = (
         subprocess.run(
-            ["sudo", "docker", "inspect", postgres_docker_container],
+            ["sudo", "docker", "inspect", container_id],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=True,
@@ -80,15 +73,28 @@ def pg_host(postgres_db, postgres_docker_container):
         .stdout.decode("utf-8")
         .strip()
     )
-    ipadress = json.loads(inspect_output)[0]["NetworkSettings"]["Networks"]["bridge"][
+    ip_address = json.loads(inspect_output)[0]["NetworkSettings"]["Networks"]["bridge"][
         "IPAddress"
     ]
-    return ipadress
+    return ip_address
+
+
+# Run before the other session-scoped fixtures, like the project_factory in pytest-inmanta
+@fixture(scope="session", autouse=True)
+def pg_host():
+    # If "PG_TEST_HOST" is set, no need for a docker container
+    if os.getenv("PG_TEST_HOST"):
+        yield os.getenv("PG_TEST_HOST")
+    else:
+        container_id = start_container()
+        ip_address = get_ip_of_container(container_id)
+        yield ip_address
+        stop_container(container_id)
 
 
 @fixture
-def pg_host_user(postgres_db):
-    return os.getenv("PG_TEST_HOST_USER") or "root"
+def pg_host_user():
+    return os.getenv("PG_TEST_HOST_USER", "root")
 
 
 @fixture
