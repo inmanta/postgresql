@@ -59,7 +59,7 @@ def stop_container(container_id: str):
             "sudo",
             "docker",
             "cp",
-            f"{container_id}:/module/std/junit.xml",
+            f"{container_id}:/module/postgresql/junit.xml",
             "junit_docker.xml",
         ],
         check=True,
