@@ -3,9 +3,10 @@ from common import deploy, dryrun
 
 def test_user(project, pg_url):
 
-    project.compile(f"""
+    project.compile(
+        f"""
     import postgresql
-    import ip 
+    import ip
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
@@ -15,13 +16,11 @@ def test_user(project, pg_url):
     user2=postgresql::User(username="test",password="test", server=server)
 
 
-    """)
+    """
+    )
     user = project.get_resource("postgresql::User", username="postgres")
     user2 = project.get_resource("postgresql::User", username="test")
 
-    
-    
-        
     c1 = dryrun(project, pg_url, user)
     assert "purged" not in c1
     assert not c1
@@ -31,11 +30,11 @@ def test_user(project, pg_url):
     deploy(project, pg_url, user2)
     c1 = dryrun(project, pg_url, user2)
     assert not c1
-    
 
-    project.compile(f"""
+    project.compile(
+        f"""
     import postgresql
-    import ip 
+    import ip
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
@@ -44,11 +43,11 @@ def test_user(project, pg_url):
     user2=postgresql::User(username="test",password="test", server=server, purged=true)
 
 
-    """)
+    """
+    )
     user2 = project.get_resource("postgresql::User", username="test")
     c1 = dryrun(project, pg_url, user2)
     assert "purged" in c1
     deploy(project, pg_url, user2)
     c1 = dryrun(project, pg_url, user2)
     assert not c1
-    

@@ -1,10 +1,10 @@
-from inmanta.agent import cache, handler
-from inmanta.agent.handler import HandlerContext
-from inmanta import const
-
 from tornado import ioloop
 
-from inmanta.export import cfg_env, Exporter
+from inmanta import const
+from inmanta.agent import cache, handler
+from inmanta.agent.handler import HandlerContext
+from inmanta.export import cfg_env
+
 
 class MockProcess(object):
     """
@@ -19,15 +19,17 @@ class MockAgent(object):
     """
         A mock agent for unit testing
     """
+
     def __init__(self, uri):
         self.uri = uri
         self.process = MockProcess()
         self._env_id = cfg_env.get()
 
+
 def get_handler(project, resource, remote):
     c = cache.AgentCache()
     agent = MockAgent(f"ssh://{remote}")
-    
+
     c.open_version(resource.id.version)
     try:
         p = handler.Commander.get_provider(c, agent, resource)
@@ -41,10 +43,14 @@ def get_handler(project, resource, remote):
     except Exception as e:
         raise e
 
+
 def dryrun(project, pg_url, resource):
     return deploy(project, pg_url, resource, True)
 
-def deploy(project, pg_url, resource, dryrun=False, status=const.ResourceState.deployed):
+
+def deploy(
+    project, pg_url, resource, dryrun=False, status=const.ResourceState.deployed
+):
     handler = get_handler(project, resource, pg_url)
     ctx = HandlerContext(resource)
     handler.execute(ctx, resource, dryrun)

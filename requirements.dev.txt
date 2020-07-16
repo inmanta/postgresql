@@ -1,1 +1,7 @@
 pytest-inmanta
+flake8==3.7.9
+flake8-black==0.1.1
+flake8-isort==2.8.0
+flake8-copyright==0.2.2
+black==19.10b0
+isort==4.3.21
