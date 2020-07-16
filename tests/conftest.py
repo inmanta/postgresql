@@ -32,7 +32,16 @@ def start_container():
     )
     container_id = (
         subprocess.run(
-            ["sudo", "docker", "run", "--rm", "-d", image_name],
+            [
+                "sudo",
+                "docker",
+                "run",
+                "--rm",
+                "-e",
+                f"POSTGRES_PASSWORD={uuid.uuid4()}",
+                "-d",
+                image_name,
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=True,
