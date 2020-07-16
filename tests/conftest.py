@@ -55,7 +55,13 @@ def start_container():
 
 def stop_container(container_id: str):
     subprocess.run(
-        ["sudo", "docker", "cp", f"{container_id}:/module/std/junit.xml", "junit.xml"],
+        [
+            "sudo",
+            "docker",
+            "cp",
+            f"{container_id}:/module/std/junit.xml",
+            "junit_docker.xml",
+        ],
         check=True,
     )
     no_clean = os.getenv("INMANTA_NO_CLEAN", "false").lower() == "true"
