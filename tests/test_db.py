@@ -5,9 +5,10 @@ def test_db(project, pg_url):
 
     # Create
 
-    project.compile(f"""
+    project.compile(
+        f"""
     import postgresql
-    import ip 
+    import ip
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
@@ -17,10 +18,11 @@ def test_db(project, pg_url):
 
     db = postgresql::Database(server=server, db_name="testdb", owner=user)
 
-    """)
+    """
+    )
     resource = project.get_resource("postgresql::Database")
 
-    # Dryrun: changes     
+    # Dryrun: changes
     c1 = dryrun(project, pg_url, resource)
     assert "purged" in c1
 
@@ -30,12 +32,13 @@ def test_db(project, pg_url):
     # Dryrun: no changes
     c1 = dryrun(project, pg_url, resource)
     assert not c1
-    
-    #Update owner
 
-    project.compile(f"""
+    # Update owner
+
+    project.compile(
+        f"""
     import postgresql
-    import ip 
+    import ip
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
@@ -45,13 +48,14 @@ def test_db(project, pg_url):
 
     db = postgresql::Database(server=server, db_name="testdb", owner=user)
 
-    """)
+    """
+    )
 
     resource = project.get_resource("postgresql::Database")
     c1 = dryrun(project, pg_url, resource)
     assert "owner" in c1
 
-    #make user
+    # make user
     user = project.get_resource("postgresql::User")
     deploy(project, pg_url, user)
 
@@ -61,12 +65,13 @@ def test_db(project, pg_url):
     # Dryrun: no changes
     c1 = dryrun(project, pg_url, resource)
     assert not c1
-    
-    ## Delete
 
-    project.compile(f"""
+    # Delete
+
+    project.compile(
+        f"""
     import postgresql
-    import ip 
+    import ip
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
@@ -76,12 +81,11 @@ def test_db(project, pg_url):
 
     db = postgresql::Database(server=server, db_name="testdb", owner=user, purged=true)
 
-    """)
+    """
+    )
     resource = project.get_resource("postgresql::Database")
     c1 = dryrun(project, pg_url, resource)
     assert "purged" in c1
     deploy(project, pg_url, resource)
     c1 = dryrun(project, pg_url, resource)
     assert not c1
-    
-    
