@@ -4,7 +4,7 @@ flake8-black==0.2.1
 flake8-isort==3.0.1
 flake8-copyright==0.2.2
 black==19.10b0
-isort==4.3.21
+isort==5.2.2
 
 # Transitive dependencies
 apipkg==1.5
