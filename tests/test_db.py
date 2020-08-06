@@ -6,7 +6,7 @@ def test_db(project, pg_url):
     # Create
 
     project.compile(
-        f"""
+        """
     import postgresql
     import ip
 
@@ -36,7 +36,7 @@ def test_db(project, pg_url):
     # Update owner
 
     project.compile(
-        f"""
+        """
     import postgresql
     import ip
 
@@ -69,7 +69,7 @@ def test_db(project, pg_url):
     # Delete
 
     project.compile(
-        f"""
+        """
     import postgresql
     import ip
 

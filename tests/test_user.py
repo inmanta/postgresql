@@ -4,7 +4,7 @@ from common import deploy, dryrun
 def test_user(project, pg_url):
 
     project.compile(
-        f"""
+        """
     import postgresql
     import ip
 
@@ -32,7 +32,7 @@ def test_user(project, pg_url):
     assert not c1
 
     project.compile(
-        f"""
+        """
     import postgresql
     import ip
 
