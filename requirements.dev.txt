@@ -9,7 +9,7 @@ isort==5.4.2
 # Transitive dependencies
 apipkg==1.5
 appdirs==1.4.4
-arrow==0.15.8
+arrow==0.16.0
 asyncpg==0.21.0
 attrs==20.1.0
 binaryornot==0.4.4
