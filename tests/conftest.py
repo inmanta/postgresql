@@ -28,7 +28,8 @@ def docker_container() -> None:
 def start_container():
     image_name = f"test-module-postgres-{uuid.uuid4()}"
     subprocess.run(
-        ["sudo", "docker", "build", ".", "-t", image_name], check=True,
+        ["sudo", "docker", "build", ".", "-t", image_name],
+        check=True,
     )
     container_id = (
         subprocess.run(
