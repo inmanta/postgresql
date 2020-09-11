@@ -8,7 +8,7 @@ from inmanta.export import cfg_env
 
 class MockProcess(object):
     """
-        A mock agentprocess
+    A mock agentprocess
     """
 
     def __init__(self):
@@ -17,7 +17,7 @@ class MockProcess(object):
 
 class MockAgent(object):
     """
-        A mock agent for unit testing
+    A mock agent for unit testing
     """
 
     def __init__(self, uri):
