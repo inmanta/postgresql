@@ -25,7 +25,7 @@ docstring-parser==0.7.3
 entrypoints==0.3
 execnet==1.7.1
 idna==2.10
-importlib-metadata==1.7.0
+importlib-metadata==2.0.0
 inmanta==2020.4.2
 Jinja2==2.11.2
 jinja2-time==0.2.0
