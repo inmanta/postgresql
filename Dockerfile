@@ -2,6 +2,9 @@ FROM postgres:10
 
 ARG BUILDDIR="/tmp/build"
 ARG PYTHON_VER="3.6.11"
+ARG PIP_INDEX_URL
+ARG PIP_PRE
+
 WORKDIR ${BUILDDIR}
 
 RUN apt-get update -qq && \
