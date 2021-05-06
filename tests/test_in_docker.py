@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 
 import pytest
 
@@ -28,6 +29,7 @@ def pip_lock_file() -> None:
             stdout=ff,
         )
     yield
+
 
 @pytest.mark.skipif(
     not os.getenv("INMANTA_TEST_INFRA_SETUP", "false").lower() == "true",
