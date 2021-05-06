@@ -32,8 +32,9 @@ WORKDIR /module/postgresql
 RUN python3 -m venv env
 RUN env/bin/pip install -U pip
 
+COPY requirements.freeze requirements.freeze
 COPY requirements.dev.txt requirements.dev.txt
-RUN env/bin/pip install -r requirements.dev.txt
+RUN env/bin/pip install -r requirements.dev.txt -c requirements.freeze
 
 COPY module.yml module.yml
 COPY model model
