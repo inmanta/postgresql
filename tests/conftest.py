@@ -27,8 +27,20 @@ def docker_container() -> None:
 
 def start_container():
     image_name = f"test-module-postgres-{uuid.uuid4()}"
+
+    docker_build_cmd = ["sudo", "docker", "build", ".", "-t", image_name]
+
+    pip_index_url = os.environ.get("PIP_INDEX_URL", None)
+    if pip_index_url is not None:
+        docker_build_cmd.append("--build-arg")
+        docker_build_cmd.append(f"PIP_INDEX_URL={pip_index_url}")
+    pip_pre = os.environ.get("PIP_PRE", None)
+    if pip_pre is not None:
+        docker_build_cmd.append("--build-arg")
+        docker_build_cmd.append(f"PIP_PRE={pip_pre}")
+
     subprocess.run(
-        ["sudo", "docker", "build", ".", "-t", image_name],
+        docker_build_cmd,
         check=True,
     )
     container_id = (

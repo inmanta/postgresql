@@ -2,6 +2,9 @@ FROM postgres:10
 
 ARG BUILDDIR="/tmp/build"
 ARG PYTHON_VER="3.6.11"
+ARG PIP_INDEX_URL
+ARG PIP_PRE
+
 WORKDIR ${BUILDDIR}
 
 RUN apt-get update -qq && \
@@ -32,8 +35,9 @@ WORKDIR /module/postgresql
 RUN python3 -m venv env
 RUN env/bin/pip install -U pip
 
+COPY requirements.freeze requirements.freeze
 COPY requirements.dev.txt requirements.dev.txt
-RUN env/bin/pip install -r requirements.dev.txt
+RUN env/bin/pip install -r requirements.dev.txt -c requirements.freeze
 
 COPY module.yml module.yml
 COPY model model
