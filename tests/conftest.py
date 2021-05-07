@@ -40,7 +40,7 @@ def start_container():
         docker_build_cmd.append(f"PIP_PRE={pip_pre}")
 
     subprocess.run(
-        ["sudo", "docker", "build", ".", "-t", image_name],
+        docker_build_cmd,
         check=True,
     )
     container_id = (
