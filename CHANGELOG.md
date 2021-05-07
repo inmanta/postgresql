@@ -1,3 +1,5 @@
+# V0.1.4
+- Ensure same python packages are installed inside and outside of the container
 # V0.1.3
 - Use inmanta-dev-dependencies package
 
