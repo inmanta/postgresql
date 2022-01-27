@@ -22,7 +22,7 @@ implementation postgresqlServer for PostgresqlServer:
         command="sudo dnf module disable postgresql",
         onlyif="which dnf",
         requires=self.requires,
-    ),
+    )
     postgresql_repo = yum::Repository(host=self.host,
                                       name="postgresql-10",
                                       gpgcheck=true,
