@@ -17,13 +17,19 @@ implement PostgresqlServer using postgresqlServer when managed
 implement PostgresqlServer using std::none when not managed
 
 implementation postgresqlServer for PostgresqlServer:
+    pre_install = exec::Run(
+        host=self.host,
+        command="sudo dnf module disable postgresql",
+        onlyif="which dnf",
+        requires=self.requires,
+    ),
     postgresql_repo = yum::Repository(host=self.host,
                                       name="postgresql-10",
                                       gpgcheck=true,
                                       enabled=true,
                                       baseurl="https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG",
-                                      requires=self.requires)
+                                      requires=pre_install)
     install_postgresql_package = std::Package(name="postgresql10-server", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_contrib_package = std::Package(name="postgresql10-contrib", host=self.host, state="latest", requires=[postgresql_repo])
     postgresql_initdb_script = exec::Run(host=self.host,
