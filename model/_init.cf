@@ -19,7 +19,7 @@ implement PostgresqlServer using std::none when not managed
 implementation postgresqlServer for PostgresqlServer:
     pre_install = exec::Run(
         host=self.host,
-        command="dnf module disable postgresql",
+        command="dnf module disable postgresql -y",
         onlyif="which dnf",
         requires=self.requires,
     )

@@ -1,3 +1,5 @@
+# V0.1.7
+- Fixed bug in RHEL 8 support
 # V0.1.6
 - Added RHEL 8 support
 # V0.1.4
