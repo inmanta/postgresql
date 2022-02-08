@@ -1,3 +1,5 @@
+# V0.1.8
+- Added support to run the tests against the V2 module of this module
 # V0.1.7
 - Fixed bug in RHEL 8 support
 # V0.1.6
