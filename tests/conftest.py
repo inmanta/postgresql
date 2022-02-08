@@ -1,7 +1,7 @@
 import os
 import subprocess
-import uuid
 import time
+import uuid
 
 import pytest
 from pytest import fixture
