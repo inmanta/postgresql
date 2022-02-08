@@ -63,7 +63,7 @@ def start_container():
         .stdout.decode("utf-8")
         .strip()
     )
-    wait_until_postgresql_process_is_up(docker_container)
+    wait_until_postgresql_process_is_up(container_id)
     print(f"Started container with id {container_id}")
     return container_id
 
