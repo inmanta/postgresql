@@ -41,7 +41,9 @@ RUN rm -rf env && python3 -m venv env && env/bin/pip install -U pip
 # installed as a V2 module when it contains a inmanta_plugins directory.
 RUN if [ -e "inmanta_plugins" ]; then \
     env/bin/pip install -r requirements.dev.txt -c requirements.freeze; \
-    env/bin/inmanta module install .; \
+    rm -rf ./dist; \
+    env/bin/inmanta module build; \
+    env/bin/pip install -c requirements.freeze ./dist/*.whl; \
 else \
     env/bin/pip install -r requirements.dev.txt -c requirements.freeze; \
 fi
