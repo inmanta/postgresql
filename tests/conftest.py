@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 import uuid
 
 import pytest
@@ -62,8 +63,35 @@ def start_container():
         .stdout.decode("utf-8")
         .strip()
     )
+    wait_until_postgresql_process_is_up(container_id)
     print(f"Started container with id {container_id}")
     return container_id
+
+
+def wait_until_postgresql_process_is_up(docker_container) -> None:
+    """
+    Execute a busy wait until the PostgreSQL process has finished starting.
+    An exception is raised after 30 failed is ready checks.
+    """
+    retries = 30
+    while retries > 0:
+        try:
+            subprocess.run(
+                [
+                    "sudo",
+                    "docker",
+                    "exec",
+                    f"{docker_container}",
+                    "pg_isready",
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError:
+            retries -= 1
+            time.sleep(1)
+        else:
+            return
+    raise Exception("Timeout while waiting for PostgreSQL server to start")
 
 
 def stop_container(container_id: str):
