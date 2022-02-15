@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture
 def pip_lock_file() -> None:
-    """ get all versions of inmanta packages into a freeze file, to make the environment inside docker like the one outside """
+    """get all versions of inmanta packages into a freeze file, to make the environment inside docker like the one outside"""
     with open("requirements.freeze.all", "w") as ff:
         subprocess.check_call([sys.executable, "-m", "pip", "freeze"], stdout=ff)
     with open("requirements.freeze.tmp", "w") as ff:
