@@ -1,0 +1,103 @@
+import postgresql
+import exec
+import yum
+import ssh
+
+# The setup procedure is statefull!
+
+# step 1: 
+#  1. set up master with synchronous_commit = off,
+#  2. set up standby (but don't start)
+# step 1.a:
+#  1. create replication slot on master
+#  2. create backup on master
+#  3. move backup to standby
+#  4. start standby
+# step 2:
+#  1. start master with synchronous_commit = on
+
+# model sync points
+# Standby.service.requires for 1.a.4
+
+
+entity Master extends PostgresqlServer:
+    string synchronous_standby_names = "inmanta"
+    string replication_slot_name = "replication"
+    string replication_user = "replication"
+    string replication_user_password
+    string synchronous_commit = "off"
+end
+
+
+entity Standby extends PostgresqlServer:
+
+end
+
+Master.standby [1:1] -- Standby.master [1]
+
+entity ReplicationSlot extends std::PurgeableResource:
+
+end
+
+ReplicationSlot.server [1] -- Master.replication_slot [1]
+
+implement Master using install, postgresqlMaster
+implement ReplicationSlot using std::none
+implement Standby using install, postgresqlStandby
+
+
+
+
+implementation postgresqlMaster for Master:
+    
+    postgresql_initdb_script = exec::Run(host=self.host,
+                                        creates="/var/lib/pgsql/10/data/pg_hba.conf",
+                                        command=exec::in_shell("sudo su -c '/usr/pgsql-10/bin/initdb /var/lib/pgsql/10/data' - postgres"),
+                                        requires=self._packages)
+    postgresql_pg_hba_file = std::File(host=self.host,
+                                    path="/var/lib/pgsql/10/data/pg_hba.conf",
+                                    mode=600,
+                                    owner="postgres",
+                                    group="postgres",
+                                    content=std::template('postgresql/pg_hba_master.conf.j2'),
+                                    requires=[postgresql_initdb_script],
+                                    reload=true)
+    postgresql_conf_file = std::File(host=self.host,
+                                    path="/var/lib/pgsql/10/data/postgresql.conf",
+                                    mode=600,
+                                    owner="postgres",
+                                    group="postgres",
+                                    content=std::template('postgresql/postgresql_master.conf.j2'),
+                                    requires=[postgresql_initdb_script],
+                                    reload=true)
+    postgresql_service = std::Service(name="postgresql-10", host=self.host, state="running", onboot=true,
+                                    requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script])
+
+    ReplicationSlot(
+        server=self,
+        provides=self.provides,
+        requires = postgresql_service
+    )
+end
+
+implementation postgresqlStandby for Standby:
+    connstring = "postgresql://{{master.replication_user}}:{{master.replication_user_password}}@{{master.host.ip}}"
+    init_cmd = "pg_basebackup -d \"{{connstring}}\" -X stream -R -D /var/lib/pgsql/10/data -S {{master.replication_slot_name}}"
+
+    postgresql_initdb_script = exec::Run(host=self.host,
+                                        creates="/var/lib/pgsql/10/data/pg_hba.conf",
+                                        command=exec::in_shell("sudo su -c '{{init_cmd}}' - postgres"),
+                                        requires=[self._packages, self.master])
+    postgresql_pg_hba_file = std::File(host=self.host,
+                                    path="/var/lib/pgsql/10/data/recovery.conf",
+                                    mode=600,
+                                    owner="postgres",
+                                    group="postgres",
+                                    content=std::template('postgresql/recovery.conf.j2'),
+                                    requires=[postgresql_initdb_script],
+                                    reload=true)
+   
+    postgresql_service = std::Service(name="postgresql-10", host=self.host, state="running", onboot=true,
+                                    requires=[postgresql_pg_hba_file])
+
+end
