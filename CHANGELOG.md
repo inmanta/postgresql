@@ -1,5 +1,8 @@
-# V0.1.9
+# V0.1.10
 - Work around for issue with exec module
+
+# V0.1.9
+- Release dependency updates
 # V0.1.8
 - Added support to run the tests against the V2 module of this module
 # V0.1.7
