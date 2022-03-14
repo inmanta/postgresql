@@ -22,7 +22,7 @@ PostgresqlServer.users [0:] -- User.server [1]
 
 PostgresqlTools.host [1] -- std::Host
 
-PostgresqlServer._packages [1:] -- std::Entity
+PostgresqlServer._packages [0:] -- std::Entity
 """
 internal Wait point: do Something(requires=_packages) to wait for all packages to be installed
 """
