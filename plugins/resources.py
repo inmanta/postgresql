@@ -36,8 +36,8 @@ class PSQLProvider(CRUDHandler):
         cmd = ["-u", "postgres", "--", "psql", "-q", "-t", "-A", "-z", "-c", cmd]
         out, err, code = self._io.run("sudo", cmd, cwd="/")
         # sanitize output
-        out = out.replace("\u0000","_")
-        err = err.replace("\u0000","_")
+        out = out.replace("\u0000", "_")
+        err = err.replace("\u0000", "_")
         ctx.info(
             "ran command sudo %(cmd)s, return code %(code)d",
             cmd=cmd,
@@ -114,34 +114,20 @@ class UserProvider(PSQLProvider):
         raise Exception("Not supported")
 
 
-@provider("postgresql::User", name="postgresql-user")
-class UserProvider(PSQLProvider):
-    def read_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        records = self.execute_sql(
-            ctx, f"SELECT 1 FROM pg_user WHERE usename = '{ resource.username }'"
-        )
-        if not records:
-            raise ResourcePurged()
-
-    def create_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        self.execute_sql(
-            ctx,
-            f"CREATE USER { resource.username } WITH PASSWORD '{ resource.password }'",
-        )
-
-    def delete_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
-        self.execute_sql(ctx, f"DROP USER { resource.username }")
-
-    def update_resource(
-        self, ctx: HandlerContext, changes: dict, resource: PurgeableResource
-    ) -> None:
-        raise Exception("Not supported")
-
-
-@resource("postgresql::ha::ReplicationSlot", agent="server.host.name", id_attribute="replication_user")
+@resource(
+    "postgresql::ha::ReplicationSlot",
+    agent="server.host.name",
+    id_attribute="replication_user",
+)
 class ReplicationSlot(PurgeableResource):
 
-    fields = ("replication_slot_name", "replication_user", "replication_user_password", "purged", "purge_on_delete")
+    fields = (
+        "replication_slot_name",
+        "replication_user",
+        "replication_user_password",
+        "purged",
+        "purge_on_delete",
+    )
 
     @staticmethod
     def get_replication_slot_name(_, resource):
@@ -160,22 +146,24 @@ class ReplicationSlot(PurgeableResource):
 class ReplicationSlotProvider(PSQLProvider):
     def read_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
         records = self.execute_sql(
-            ctx, f"SELECT 1 FROM pg_user WHERE usename = '{ resource.replication_user }'"
+            ctx,
+            f"SELECT 1 FROM pg_user WHERE usename = '{ resource.replication_user }'",
         )
         if not records:
             raise ResourcePurged()
-        
+
         records = self.execute_sql(
-            ctx, f"select * from pg_replication_slots where slot_name='{ resource.replication_slot_name }'"
+            ctx,
+            f"select * from pg_replication_slots where slot_name='{ resource.replication_slot_name }'",
         )
         if not records:
             resource.replication_slot_name = ""
 
-
     def create_resource(self, ctx: HandlerContext, resource: PurgeableResource) -> None:
         self.execute_sql(
             ctx,
-            f"CREATE USER { resource.replication_user } WITH REPLICATION LOGIN PASSWORD '{ resource.replication_user_password }';",
+            f"CREATE USER { resource.replication_user } WITH "
+            f"REPLICATION LOGIN PASSWORD '{ resource.replication_user_password }';",
         )
         self.update_resource(ctx, {}, resource)
 
@@ -184,7 +172,7 @@ class ReplicationSlotProvider(PSQLProvider):
         self.execute_sql(
             ctx,
             f"SELECT * FROM pg_drop_replication_slot('{resource.replication_slot_name}');",
-        )   
+        )
 
     def update_resource(
         self, ctx: HandlerContext, changes: dict, resource: PurgeableResource
@@ -192,4 +180,4 @@ class ReplicationSlotProvider(PSQLProvider):
         self.execute_sql(
             ctx,
             f"SELECT * FROM pg_create_physical_replication_slot('{resource.replication_slot_name}');",
-        )        
+        )
