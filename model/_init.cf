@@ -34,6 +34,7 @@ implementation postgresqlServer for PostgresqlServer:
     install_postgresql_contrib_package = std::Package(name="postgresql10-contrib", host=self.host, state="latest", requires=[postgresql_repo])
     postgresql_initdb_script = exec::Run(host=self.host,
                                         creates="/var/lib/pgsql/10/data/pg_hba.conf",
+                                        reload="/usr/bin/true", # fix for https://github.com/inmanta/exec/issues/185
                                         command=exec::in_shell("sudo su -c '/usr/pgsql-10/bin/initdb /var/lib/pgsql/10/data' - postgres"),
                                         requires=[install_postgresql_contrib_package, install_postgresql_package])
     postgresql_pg_hba_file = std::File(host=self.host,
