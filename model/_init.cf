@@ -3,7 +3,7 @@ import exec
 import yum
 
 # for resource typing
-import postgresql::ha 
+import postgresql::ha
 
 # can not be uppercase
 typedef username_t as string matching /[a-z0-9]*/
@@ -33,13 +33,19 @@ implement PostgresqlTools using install_tools
 
 
 implementation install for PostgresqlServer:
+    pre_install = exec::Run(
+        host=self.host,
+        command="dnf module disable postgresql -y",
+        onlyif="which dnf",
+        requires=self.requires,
+    )
     postgresql_repo = yum::Repository(host=self.host,
                                       name="postgresql-10",
                                       gpgcheck=true,
                                       enabled=true,
                                       baseurl="https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG",
-                                      requires=self.requires)
+                                      requires=pre_install)
     install_postgresql_package = std::Package(name="postgresql10-server", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_contrib_package = std::Package(name="postgresql10-contrib", host=self.host, state="latest", requires=[postgresql_repo])
     self._packages = [install_postgresql_package, install_postgresql_contrib_package]
@@ -60,6 +66,7 @@ end
 implementation postgresqlServer for PostgresqlServer:
     postgresql_initdb_script = exec::Run(host=self.host,
                                         creates="/var/lib/pgsql/10/data/pg_hba.conf",
+                                        reload="/bin/true", # fix for https://github.com/inmanta/exec/issues/185
                                         command=exec::in_shell("sudo su -c '/usr/pgsql-10/bin/initdb /var/lib/pgsql/10/data' - postgres"),
                                         requires=self._packages)
     postgresql_pg_hba_file = std::File(host=self.host,
