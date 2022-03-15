@@ -59,7 +59,7 @@ implementation install_tools for PostgresqlTools:
                                       baseurl="https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG",
                                       requires=self.requires)
-    install_postgresql_package = std::Package(name="PostgresqlTools", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package = std::Package(name="postgresql10", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_package.provides = self.provides
 end
 
