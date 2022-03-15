@@ -91,8 +91,8 @@ host    all             all             ::1/128                 md5
 local   replication     all                                     peer
 host    replication     all             127.0.0.1/32            ident
 host    replication     all             ::1/128                 ident
-host    replication     replication     {{host.ip}}/32        md5
-host    replication     replication     {{standby.host.ip}}/32       md5
+host    replication     {{replication_user}}     {{host.ip}}/32        md5
+host    replication     {{replication_user}}     {{standby.host.ip}}/32       md5
 
 {% for user in users %}{% for database in user.databases %}{% for from in user.from %}
 host    {{database.db_name}}     {{user.username}}             {{from}}            md5
