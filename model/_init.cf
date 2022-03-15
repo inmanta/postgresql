@@ -2,6 +2,9 @@ import ip::services
 import exec
 import yum
 
+# for resource typing
+import postgresql::ha
+
 # can not be uppercase
 typedef username_t as string matching /[a-z0-9]*/
 
@@ -10,13 +13,26 @@ entity PostgresqlServer extends ip::services::Server:
     bool managed = true
 end
 
+entity PostgresqlTools:
+    """Install the postgresql client tools on a host."""
+end
+
 PostgresqlServer.databases [0:] -- Database.server [1]
 PostgresqlServer.users [0:] -- User.server [1]
 
-implement PostgresqlServer using postgresqlServer when managed
-implement PostgresqlServer using std::none when not managed
+PostgresqlTools.host [1] -- std::Host
 
-implementation postgresqlServer for PostgresqlServer:
+PostgresqlServer._packages [0:] -- std::Entity
+"""
+internal Wait point: do Something(requires=_packages) to wait for all packages to be installed
+"""
+
+implement PostgresqlServer using postgresqlServer, install when managed
+implement PostgresqlServer using std::none when not managed
+implement PostgresqlTools using install_tools
+
+
+implementation install for PostgresqlServer:
     pre_install = exec::Run(
         host=self.host,
         command="dnf module disable postgresql -y",
@@ -32,11 +48,27 @@ implementation postgresqlServer for PostgresqlServer:
                                       requires=pre_install)
     install_postgresql_package = std::Package(name="postgresql10-server", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_contrib_package = std::Package(name="postgresql10-contrib", host=self.host, state="latest", requires=[postgresql_repo])
+    self._packages = [install_postgresql_package, install_postgresql_contrib_package]
+end
+
+implementation install_tools for PostgresqlTools:
+    postgresql_repo = yum::Repository(host=self.host,
+                                      name="postgresql-10",
+                                      gpgcheck=true,
+                                      enabled=true,
+                                      baseurl="https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-$releasever-$basearch",
+                                      gpgkey="https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG",
+                                      requires=self.requires)
+    install_postgresql_package = std::Package(name="postgresql10", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package.provides = self.provides
+end
+
+implementation postgresqlServer for PostgresqlServer:
     postgresql_initdb_script = exec::Run(host=self.host,
                                         creates="/var/lib/pgsql/10/data/pg_hba.conf",
                                         reload="/bin/true", # fix for https://github.com/inmanta/exec/issues/185
                                         command=exec::in_shell("sudo su -c '/usr/pgsql-10/bin/initdb /var/lib/pgsql/10/data' - postgres"),
-                                        requires=[install_postgresql_contrib_package, install_postgresql_package])
+                                        requires=self._packages)
     postgresql_pg_hba_file = std::File(host=self.host,
                                     path="/var/lib/pgsql/10/data/pg_hba.conf",
                                     mode=600,
@@ -55,13 +87,16 @@ implementation postgresqlServer for PostgresqlServer:
                                     reload=true)
     postgresql_service = std::Service(name="postgresql-10", host=self.host, state="running", onboot=true,
                                     requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script], provides=self.provides)
-
 end
 
 
 entity User extends std::PurgeableResource:
+"""
+    :attr from: network location this user is allowed to connect from
+"""
     username_t username
     string password
+    string[] from = ["127.0.0.1/32", "::1/128"]
 end
 
 index User(server, username)
@@ -79,7 +114,7 @@ end
 
 index Database(server, db_name)
 
-Database.owner [1] -- User
+Database.owner [1] -- User.databases [0:]
 
 implement Database using db_requires
 

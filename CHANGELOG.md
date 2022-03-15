@@ -1,3 +1,6 @@
+# V0.2.0
+- Added HA support
+
 # V0.1.10
 - Work around for issue with exec module
 
