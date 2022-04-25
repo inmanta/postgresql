@@ -1,3 +1,6 @@
+# V0.2.1
+- Add pyproject.toml file and set asyncio_mode to auto
+
 # V0.2.0
 - Added HA support
 
