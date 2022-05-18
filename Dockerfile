@@ -4,20 +4,21 @@ ARG BUILDDIR="/tmp/build"
 ARG PYTHON_VER="3.9.6"
 ARG PIP_INDEX_URL
 ARG PIP_PRE
+ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR ${BUILDDIR}
 
 RUN apt-get update -qq && \
-apt-get upgrade -y
+    apt-get upgrade -y
 RUN apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev
 RUN apt-get install wget gcc make zlib1g-dev -y -qq > /dev/null 2>&1 && \
-wget --quiet https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz > /dev/null 2>&1 && \
-tar zxf Python-${PYTHON_VER}.tgz && \
-cd Python-${PYTHON_VER} && \
-./configure  > /dev/null 2>&1 && \
-make > /dev/null 2>&1 && \
-make install > /dev/null 2>&1 && \
-rm -rf ${BUILDDIR}
+    wget --quiet https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz > /dev/null 2>&1 && \
+    tar zxf Python-${PYTHON_VER}.tgz && \
+    cd Python-${PYTHON_VER} && \
+    ./configure  > /dev/null 2>&1 && \
+    make > /dev/null 2>&1 && \
+    make install > /dev/null 2>&1 && \
+    rm -rf ${BUILDDIR}
 
 RUN apt-get install -y openssh-server sudo git supervisor python3-venv
 
@@ -44,8 +45,8 @@ RUN if [ -e "inmanta_plugins" ]; then \
     rm -rf ./dist; \
     env/bin/inmanta module build; \
     env/bin/pip install -c requirements.freeze ./dist/*.whl; \
-else \
+    else \
     env/bin/pip install -r requirements.dev.txt -c requirements.freeze; \
-fi
+    fi
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
