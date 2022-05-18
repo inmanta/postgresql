@@ -1,3 +1,6 @@
+# V0.2.2
+- add ENV DEBIAN_FRONTEND=noninteractive to dockerfile
+
 # V0.2.1
 - Add pyproject.toml file and set asyncio_mode to auto
 
