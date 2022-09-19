@@ -11,6 +11,8 @@ typedef username_t as string matching /[a-z0-9]*/
 entity PostgresqlServer extends ip::services::Server:
     # Nothing
     bool managed = true
+    int log_min_duration_statement = -1
+    bool pg_stat_statements=false
 end
 
 entity PostgresqlTools:

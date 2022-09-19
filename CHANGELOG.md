@@ -1,3 +1,7 @@
+
+# v0.3.0
+- Add support for stat statement and slow query logging
+
 # V0.2.2
 - add ENV DEBIAN_FRONTEND=noninteractive to dockerfile
 
