@@ -1,1 +1,1 @@
-inmanta-dev-dependencies[module]==2.37.0
+inmanta-dev-dependencies[module]==2.38.0
