@@ -27,7 +27,7 @@ def test_db(project, pg_url):
     import postgresql
     import ip
 
-    host = ip::Host(name="test", ip="10.0.0.1", os=std::OS(name="fq-python-linux", python_cmd="python3", family=std::linux))
+    host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
     server = postgresql::PostgresqlServer(host=host, managed=false)
 
@@ -57,7 +57,7 @@ def test_db(project, pg_url):
     import postgresql
     import ip
 
-    host = ip::Host(name="test", ip="10.0.0.1", os=std::OS(name="fq-python-linux", python_cmd="python3", family=std::linux))
+    host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
     server = postgresql::PostgresqlServer(host=host, managed=false)
 
@@ -90,7 +90,7 @@ def test_db(project, pg_url):
     import postgresql
     import ip
 
-    host = ip::Host(name="test", ip="10.0.0.1", os=std::OS(name="fq-python-linux", python_cmd="python3", family=std::linux))
+    host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
     server = postgresql::PostgresqlServer(host=host, managed=false)
 
