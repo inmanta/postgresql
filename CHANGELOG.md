@@ -1,4 +1,4 @@
-# v0.3.1
+# v0.3.2
 - Updated Dockerfile to use Debian 11 (bullseye) image
 
 # v0.3.0
