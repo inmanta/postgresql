@@ -1,3 +1,6 @@
+# v0.3.3
+- Fixed test compatibility with Debian 11
+
 # v0.3.2
 - Updated Dockerfile to use Debian 11 (bullseye) image
 

@@ -25,7 +25,7 @@ def test_user(project, pg_url):
     import postgresql
     import ip
 
-    host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
+    host = ip::Host(name="test", ip="10.0.0.1", os=std::OS(name="fq-python-linux", family=std::linux))
 
     server = postgresql::PostgresqlServer(host=host, managed=false)
 
@@ -53,7 +53,7 @@ def test_user(project, pg_url):
     import postgresql
     import ip
 
-    host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
+    host = ip::Host(name="test", ip="10.0.0.1", os=std::OS(name="fq-python-linux", family=std::linux))
 
     server = postgresql::PostgresqlServer(host=host, managed=false)
 
