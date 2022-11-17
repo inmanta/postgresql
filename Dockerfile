@@ -18,6 +18,8 @@ RUN apt-get install wget gcc make zlib1g-dev -y -qq > /dev/null 2>&1 && \
     ./configure  > /dev/null 2>&1 && \
     make > /dev/null 2>&1 && \
     make install > /dev/null 2>&1 && \
+    cd "$(dirname "$(which python3)")" && \
+    ln -s python3 python && \
     rm -rf ${BUILDDIR}
 
 RUN apt-get install -y openssh-server sudo git supervisor python3-venv
