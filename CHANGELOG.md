@@ -1,3 +1,6 @@
+# v0.3.3
+- Fixed Dockerfile missing python executable
+
 # v0.3.2
 - Updated Dockerfile to use Debian 11 (bullseye) image
 
