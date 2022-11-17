@@ -1,4 +1,4 @@
-FROM postgres:10
+FROM postgres:10-bullseye
 
 ARG BUILDDIR="/tmp/build"
 ARG PYTHON_VER="3.9.6"
