@@ -42,37 +42,37 @@ implementation install for PostgresqlServer:
         requires=self.requires,
     )
     postgresql_repo = yum::Repository(host=self.host,
-                                      name="postgresql-10",
+                                      name="postgresql-13",
                                       gpgcheck=true,
                                       enabled=true,
-                                      baseurl="https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-$releasever-$basearch",
+                                      baseurl="https://download.postgresql.org/pub/repos/yum/13/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG",
                                       requires=pre_install)
-    install_postgresql_package = std::Package(name="postgresql10-server", host=self.host, state="latest", requires=[postgresql_repo])
-    install_postgresql_contrib_package = std::Package(name="postgresql10-contrib", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package = std::Package(name="postgresql13-server", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_contrib_package = std::Package(name="postgresql13-contrib", host=self.host, state="latest", requires=[postgresql_repo])
     self._packages = [install_postgresql_package, install_postgresql_contrib_package]
 end
 
 implementation install_tools for PostgresqlTools:
     postgresql_repo = yum::Repository(host=self.host,
-                                      name="postgresql-10",
+                                      name="postgresql-13",
                                       gpgcheck=true,
                                       enabled=true,
-                                      baseurl="https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-$releasever-$basearch",
+                                      baseurl="https://download.postgresql.org/pub/repos/yum/13/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG",
                                       requires=self.requires)
-    install_postgresql_package = std::Package(name="postgresql10", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package = std::Package(name="postgresql13", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_package.provides = self.provides
 end
 
 implementation postgresqlServer for PostgresqlServer:
     postgresql_initdb_script = exec::Run(host=self.host,
-                                        creates="/var/lib/pgsql/10/data/pg_hba.conf",
+                                        creates="/var/lib/pgsql/13/data/pg_hba.conf",
                                         reload="/bin/true", # fix for https://github.com/inmanta/exec/issues/185
-                                        command=exec::in_shell("sudo su -c '/usr/pgsql-10/bin/initdb /var/lib/pgsql/10/data' - postgres"),
+                                        command=exec::in_shell("sudo su -c '/usr/pgsql-13/bin/initdb /var/lib/pgsql/13/data' - postgres"),
                                         requires=self._packages)
     postgresql_pg_hba_file = std::File(host=self.host,
-                                    path="/var/lib/pgsql/10/data/pg_hba.conf",
+                                    path="/var/lib/pgsql/13/data/pg_hba.conf",
                                     mode=600,
                                     owner="postgres",
                                     group="postgres",
@@ -80,14 +80,14 @@ implementation postgresqlServer for PostgresqlServer:
                                     requires=[postgresql_initdb_script],
                                     reload=true)
     postgresql_conf_file = std::File(host=self.host,
-                                    path="/var/lib/pgsql/10/data/postgresql.conf",
+                                    path="/var/lib/pgsql/13/data/postgresql.conf",
                                     mode=600,
                                     owner="postgres",
                                     group="postgres",
                                     content=std::template('postgresql/postgresql.conf.j2'),
                                     requires=[postgresql_initdb_script],
                                     reload=true)
-    postgresql_service = std::Service(name="postgresql-10", host=self.host, state="running", onboot=true,
+    postgresql_service = std::Service(name="postgresql-13", host=self.host, state="running", onboot=true,
                                     requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script], provides=self.provides)
 end
 
