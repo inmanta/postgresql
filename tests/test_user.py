@@ -18,6 +18,7 @@
 
 from common import deploy, dryrun
 
+
 def test_user(project, pg_url, pg_version_fallback):
 
     project.compile(

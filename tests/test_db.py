@@ -18,6 +18,7 @@
 
 from common import deploy, dryrun
 
+
 def test_db(project, pg_url, pg_version_fallback):
 
     # Create

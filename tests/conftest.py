@@ -44,7 +44,7 @@ def docker_container(request) -> None:
     stop_container(container_id)
 
 
-def start_container(pg_version: int=10):
+def start_container(pg_version: int = 10):
     image_name = f"test-module-postgres-{uuid.uuid4()}"
 
     docker_build_cmd = ["sudo", "docker", "build", ".", "-t", image_name]
@@ -149,6 +149,7 @@ def pg_host_line(pg_host, pg_host_user):
 @fixture
 def pg_url(pg_host, pg_host_user):
     return f"""{pg_host_user}@{pg_host}"""
+
 
 @fixture
 def pg_version_fallback():
