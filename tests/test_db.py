@@ -31,7 +31,7 @@ def test_db(project, pg_url, pg_version_fallback):
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
-    pg_version=std::get_env_int("PG_MAJOR_VERSION",{pg_version_fallback})
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
     server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
 
 
@@ -64,7 +64,7 @@ def test_db(project, pg_url, pg_version_fallback):
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
-    pg_version=std::get_env_int("PG_MAJOR_VERSION",{pg_version_fallback})
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
     server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
 
     user=postgresql::User(username="testuserx",password="test", server=server)
@@ -99,7 +99,7 @@ def test_db(project, pg_url, pg_version_fallback):
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
-    pg_version=std::get_env_int("PG_MAJOR_VERSION",{pg_version_fallback})
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
     server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
 
     user=postgresql::User(username="postgres",password="test", server=server)
