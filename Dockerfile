@@ -1,5 +1,5 @@
 ARG PG_MAJOR_VERSION
-FROM postgres:$PG_MAJOR_VERSION-bullseye
+FROM postgres:${PG_MAJOR_VERSION}-bullseye
 ARG PG_MAJOR_VERSION
 
 # Store the Postgres major version into an env variable to make it available from within the tests
