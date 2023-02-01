@@ -89,7 +89,7 @@ implementation postgresqlStandby for Standby:
                                         command=exec::in_shell("sudo su -c '{{init_cmd}}' - postgres"),
                                         requires=[self._packages, self.master])
     postgresql_pg_hba_file = std::File(host=self.host,
-                                    path="/var/lib/pgsql/{{ master.pg_version }}/data/recovery.conf",
+                                    path="/var/lib/pgsql/{{ pg_version }}/data/recovery.conf",
                                     mode=600,
                                     owner="postgres",
                                     group="postgres",
