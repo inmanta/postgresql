@@ -44,7 +44,7 @@ def docker_container(request) -> None:
     stop_container(container_id)
 
 
-def start_container(pg_version: int = 10):
+def start_container(pg_version: int):
     image_name = f"test-module-postgres-{uuid.uuid4()}"
 
     docker_build_cmd = ["sudo", "docker", "build", ".", "-t", image_name]
