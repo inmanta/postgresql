@@ -97,7 +97,7 @@ implementation postgresqlStandby for Standby:
                                     requires=[postgresql_initdb_script],
                                     reload=true)
 
-    postgresql_service = std::Service(name="postgresql-{{ master.pg_version }}", host=self.host, state="running", onboot=true,
+    postgresql_service = std::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
                                     requires=[postgresql_pg_hba_file])
 
 end
