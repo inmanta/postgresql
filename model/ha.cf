@@ -85,7 +85,7 @@ implementation postgresqlStandby for Standby:
     init_cmd = "pg_basebackup -d \"{{connstring}}\" -X stream -R -D /var/lib/pgsql/{{ pg_version }}/data -S {{master.replication_slot_name}}"
 
     postgresql_initdb_script = exec::Run(host=self.host,
-                                        creates="/var/lib/pgsql/{{ master.pg_version }}/data/pg_hba.conf",
+                                        creates="/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf",
                                         command=exec::in_shell("sudo su -c '{{init_cmd}}' - postgres"),
                                         requires=[self._packages, self.master])
     postgresql_pg_hba_file = std::File(host=self.host,
