@@ -18,6 +18,7 @@ end
 
 entity PostgresqlTools:
     """Install the postgresql client tools on a host."""
+    int pg_version = 10
 end
 
 PostgresqlServer.databases [0:] -- Database.server [1]
