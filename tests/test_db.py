@@ -19,7 +19,6 @@ from common import deploy, dryrun
 
 
 def test_db(project, pg_url):
-
     # Create
 
     project.compile(

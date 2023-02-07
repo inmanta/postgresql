@@ -19,7 +19,6 @@ from common import deploy, dryrun
 
 
 def test_user(project, pg_url):
-
     project.compile(
         """
     import postgresql
