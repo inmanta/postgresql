@@ -18,7 +18,6 @@ from inmanta.resources import IgnoreResourceException, PurgeableResource, resour
 
 @resource("postgresql::Database", agent="server.host.name", id_attribute="db_name")
 class Database(PurgeableResource):
-
     fields = ("db_name", "owner", "purged", "purge_on_delete")
 
     @staticmethod
@@ -86,7 +85,6 @@ class DatabaseProvider(PSQLProvider):
 
 @resource("postgresql::User", agent="server.host.name", id_attribute="username")
 class User(PurgeableResource):
-
     fields = ("username", "password", "purged", "purge_on_delete")
 
 
@@ -120,7 +118,6 @@ class UserProvider(PSQLProvider):
     id_attribute="replication_user",
 )
 class ReplicationSlot(PurgeableResource):
-
     fields = (
         "replication_slot_name",
         "replication_user",
