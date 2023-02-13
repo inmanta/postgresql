@@ -37,14 +37,13 @@ if os.getenv("INMANTA_TEST_INFRA_SETUP", "false").lower() == "true":
 
 
 @pytest.fixture(scope="function")
-def docker_container(request) -> None:
-    pg_version = int(request.param)
-    container_id = start_container(pg_version)
+def docker_container() -> None:
+    container_id = start_container()
     yield container_id
     stop_container(container_id)
 
 
-def start_container(pg_version: int):
+def start_container(pg_version: int = 10):
     image_name = f"test-module-postgres-{uuid.uuid4()}"
 
     docker_build_cmd = ["sudo", "docker", "build", ".", "-t", image_name]

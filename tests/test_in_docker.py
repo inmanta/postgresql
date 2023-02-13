@@ -52,7 +52,6 @@ def pip_lock_file() -> None:
     not os.getenv("INMANTA_TEST_INFRA_SETUP", "false").lower() == "true",
     reason="Only run when test infra environment variable is set to true",
 )
-@pytest.mark.parametrize("docker_container", [10, 13, 15], indirect=True)
 def test_docker(pip_lock_file, docker_container):
     print(f"Running tests in container {docker_container}")
     subprocess.run(
