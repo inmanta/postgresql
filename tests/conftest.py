@@ -153,5 +153,5 @@ def pg_url(pg_host, pg_host_user):
 @fixture
 def pg_version_fallback():
     """Default to this Major Postgres version for tests running outside of a docker container
-    where the PG_MAJOR_VERSION env variable is not set"""
+    if the PG_MAJOR_VERSION env variable is not set"""
     return 10

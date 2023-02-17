@@ -6,6 +6,6 @@ host = ip::Host(name="test", ip="192.168.2.115", os=redhat::rocky8, remote_agent
 
 server = postgresql::PostgresqlServer(host=host, pg_version=13)
 
-user=postgresql::User(username="testx",password="test", server=server)
+user=postgresql::User(username="testx", password="test", server=server)
 
 db = postgresql::Database(server=server, db_name="testdb", owner=user)
