@@ -15,18 +15,20 @@
 
     Contact: code@inmanta.com
 """
+
 from common import deploy, dryrun
 
 
-def test_user(project, pg_url):
+def test_user(project, pg_url, pg_version_fallback):
     project.compile(
-        """
+        f"""
     import postgresql
     import ip
+    import std
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
-
-    server = postgresql::PostgresqlServer(host=host, managed=false)
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
+    server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
 
     user=postgresql::User(username="postgres",password="test", server=server)
     user2=postgresql::User(username="test",password="test", server=server)
@@ -48,13 +50,16 @@ def test_user(project, pg_url):
     assert not c1
 
     project.compile(
-        """
+        f"""
     import postgresql
     import ip
+    import std
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
-    server = postgresql::PostgresqlServer(host=host, managed=false)
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
+
+    server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
 
     user2=postgresql::User(username="test",password="test", server=server, purged=true)
 

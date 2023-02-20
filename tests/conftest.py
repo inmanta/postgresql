@@ -43,10 +43,12 @@ def docker_container() -> None:
     stop_container(container_id)
 
 
-def start_container():
+def start_container(pg_version: int = 10):
     image_name = f"test-module-postgres-{uuid.uuid4()}"
 
     docker_build_cmd = ["sudo", "docker", "build", ".", "-t", image_name]
+    docker_build_cmd.append("--build-arg")
+    docker_build_cmd.append(f"PG_MAJOR_VERSION={pg_version}")
 
     pip_index_url = os.environ.get("PIP_INDEX_URL", None)
     if pip_index_url is not None:
@@ -146,3 +148,10 @@ def pg_host_line(pg_host, pg_host_user):
 @fixture
 def pg_url(pg_host, pg_host_user):
     return f"""{pg_host_user}@{pg_host}"""
+
+
+@fixture
+def pg_version_fallback():
+    """Default to this Major Postgres version for tests running outside of a docker container
+    if the PG_MAJOR_VERSION env variable is not set"""
+    return 10

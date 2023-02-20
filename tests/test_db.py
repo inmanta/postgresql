@@ -15,20 +15,24 @@
 
     Contact: code@inmanta.com
 """
+
 from common import deploy, dryrun
 
 
-def test_db(project, pg_url):
+def test_db(project, pg_url, pg_version_fallback):
     # Create
 
     project.compile(
-        """
+        f"""
     import postgresql
     import ip
+    import std
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
-    server = postgresql::PostgresqlServer(host=host, managed=false)
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
+    server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
+
 
     user=postgresql::User(username="postgres",password="test", server=server)
 
@@ -52,13 +56,15 @@ def test_db(project, pg_url):
     # Update owner
 
     project.compile(
-        """
+        f"""
     import postgresql
     import ip
+    import std
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
-    server = postgresql::PostgresqlServer(host=host, managed=false)
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
+    server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
 
     user=postgresql::User(username="testuserx",password="test", server=server)
 
@@ -85,13 +91,15 @@ def test_db(project, pg_url):
     # Delete
 
     project.compile(
-        """
+        f"""
     import postgresql
     import ip
+    import std
 
     host = ip::Host(name="test", ip="10.0.0.1", os=std::linux)
 
-    server = postgresql::PostgresqlServer(host=host, managed=false)
+    pg_version=std::get_env_int("PG_MAJOR_VERSION", {pg_version_fallback})
+    server = postgresql::PostgresqlServer(host=host, managed=false, pg_version=pg_version)
 
     user=postgresql::User(username="postgres",password="test", server=server)
 
