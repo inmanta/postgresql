@@ -2,6 +2,7 @@
 
 ## v0.4.2 - ?
 
+- Don't execute the apt-get upgrade command in the Dockerfile for the tests to prevent issue with invalid locale
 
 ## v0.4.1 - 2023-04-04
 
