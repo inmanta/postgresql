@@ -13,8 +13,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR ${BUILDDIR}
 
-RUN apt-get update -qq && \
-    apt-get upgrade -y
+RUN apt-get update -qq
 RUN apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev
 RUN apt-get install wget gcc make zlib1g-dev -y -qq > /dev/null 2>&1 && \
     wget --quiet https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz > /dev/null 2>&1 && \
