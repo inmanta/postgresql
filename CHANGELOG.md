@@ -1,7 +1,8 @@
 # Changelog
 
-## v0.4.4 - ?
+## v1.0.0 - ?
 
+- Install PG13 by default instead of PG10
 
 ## v0.4.3 - 2023-06-30
 
