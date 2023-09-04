@@ -13,12 +13,12 @@ entity PostgresqlServer extends ip::services::Server:
     bool managed = true
     int log_min_duration_statement = -1
     bool pg_stat_statements=false
-    int pg_version = 10
+    int pg_version = 13
 end
 
 entity PostgresqlTools:
     """Install the postgresql client tools on a host."""
-    int pg_version = 10
+    int pg_version = 13
 end
 
 PostgresqlServer.databases [0:] -- Database.server [1]
