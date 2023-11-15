@@ -54,11 +54,14 @@ def pip_lock_file() -> None:
 )
 def test_docker(pip_lock_file, docker_container):
     print(f"Running tests in container {docker_container}")
+    pip_index_url = os.getenv("PIP_INDEX_URL", "https://pypi.python.org/simple")
     subprocess.run(
         [
             "sudo",
             "docker",
             "exec",
+            "-e",
+            f"PIP_INDEX_URL={pip_index_url}",
             f"{docker_container}",
             "env/bin/pytest",
             "tests/",
