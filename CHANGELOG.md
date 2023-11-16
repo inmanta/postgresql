@@ -1,7 +1,8 @@
 # Changelog
 
-## v1.0.2 - ?
+## v1.0.2 - 2023-11-16
 
+- Updated tests for iso 7
 
 ## v1.0.1 - 2023-10-12
 
