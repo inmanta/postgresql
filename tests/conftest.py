@@ -19,6 +19,7 @@ import os
 import subprocess
 import time
 import uuid
+import sys
 
 import pytest
 from pytest import fixture
@@ -49,6 +50,11 @@ def start_container(pg_version: int = 10):
     docker_build_cmd = ["sudo", "docker", "build", ".", "-t", image_name]
     docker_build_cmd.append("--build-arg")
     docker_build_cmd.append(f"PG_MAJOR_VERSION={pg_version}")
+
+    # Set PYTHON_VER build argument
+    python_version='.'.join([str(part) for part in sys.version_info[0:3]])
+    docker_build_cmd.append("--build-arg")
+    docker_build_cmd.append(f"PYTHON_VER={python_version}")
 
     pip_index_url = os.environ.get("PIP_INDEX_URL", None)
     if pip_index_url is not None:
