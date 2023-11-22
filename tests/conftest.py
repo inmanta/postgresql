@@ -17,9 +17,9 @@
 """
 import os
 import subprocess
+import sys
 import time
 import uuid
-import sys
 
 import pytest
 from pytest import fixture
@@ -52,7 +52,7 @@ def start_container(pg_version: int = 10):
     docker_build_cmd.append(f"PG_MAJOR_VERSION={pg_version}")
 
     # Set PYTHON_VER build argument
-    python_version='.'.join([str(part) for part in sys.version_info[0:3]])
+    python_version = ".".join([str(part) for part in sys.version_info[0:3]])
     docker_build_cmd.append("--build-arg")
     docker_build_cmd.append(f"PYTHON_VER={python_version}")
 
