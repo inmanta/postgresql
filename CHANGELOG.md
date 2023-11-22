@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.3 - ?
+## v1.0.3 - 2023-11-22
 
 - Use the same python inside and outside of container while running the tests
 
