@@ -1,12 +1,12 @@
 ARG PG_MAJOR_VERSION
 FROM postgres:${PG_MAJOR_VERSION}-bullseye
 ARG PG_MAJOR_VERSION
+ARG PYTHON_VER
 
 # Store the Postgres major version into an env variable to make it available from within the tests
 ENV PG_MAJOR_VERSION=${PG_MAJOR_VERSION}
 
 ARG BUILDDIR="/tmp/build"
-ARG PYTHON_VER="3.9.6"
 ARG PIP_INDEX_URL
 ARG PIP_PRE
 ENV DEBIAN_FRONTEND=noninteractive
