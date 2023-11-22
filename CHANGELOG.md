@@ -2,6 +2,7 @@
 
 ## v1.0.3 - ?
 
+- Use the same python inside and outside of container while running the tests
 
 ## v1.0.2 - 2023-11-16
 
