@@ -1,4 +1,3 @@
-import ip::services
 import exec
 import yum
 
@@ -8,13 +7,15 @@ import postgresql::ha
 # can not be uppercase
 typedef username_t as string matching /[a-z0-9]*/
 
-entity PostgresqlServer extends ip::services::Server:
+entity PostgresqlServer:
     # Nothing
     bool managed = true
     int log_min_duration_statement = -1
     bool pg_stat_statements=false
     int pg_version = 13
 end
+
+PostgresqlServer.host [1] -- std::Host
 
 entity PostgresqlTools:
     """Install the postgresql client tools on a host."""
