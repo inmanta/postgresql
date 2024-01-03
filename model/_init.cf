@@ -49,7 +49,7 @@ implementation install for PostgresqlServer:
                                       gpgcheck=true,
                                       enabled=true,
                                       baseurl="https://download.postgresql.org/pub/repos/yum/{{ pg_version }}/redhat/rhel-$releasever-$basearch",
-                                      gpgkey="https://download.postgresql.org/pub/repos/yum/PGDG-RPM-GPG-KEY-",
+                                      gpgkey="https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL",
                                       requires=pre_install)
     install_postgresql_package = std::Package(name="postgresql{{ pg_version }}-server", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_contrib_package = std::Package(name="postgresql{{ pg_version }}-contrib", host=self.host, state="latest", requires=[postgresql_repo])
@@ -62,7 +62,7 @@ implementation install_tools for PostgresqlTools:
                                       gpgcheck=true,
                                       enabled=true,
                                       baseurl="https://download.postgresql.org/pub/repos/yum/{{ pg_version }}/redhat/rhel-$releasever-$basearch",
-                                      gpgkey="https://download.postgresql.org/pub/repos/yum/PGDG-RPM-GPG-KEY-",
+                                      gpgkey="https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL",
                                       requires=self.requires)
     install_postgresql_package = std::Package(name="postgresql{{ pg_version }}", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_package.provides = self.provides
