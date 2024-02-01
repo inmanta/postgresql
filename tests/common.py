@@ -15,6 +15,7 @@
 
     Contact: code@inmanta.com
 """
+
 from tornado import ioloop
 
 from inmanta import const
