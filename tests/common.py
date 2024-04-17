@@ -42,6 +42,8 @@ class MockAgent(object):
         self.uri = uri
         self.process = MockProcess()
         self._env_id = cfg_env.get()
+        # This is for the new agent api in inmanta.agent.executor.AgentInstance
+        self.eventloop = self.process._io_loop
 
 
 def get_handler(project, resource, remote):
