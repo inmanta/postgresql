@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.9 - ?
+## v1.0.9 - 2024-04-17
 
 - Fixed test compatibility with inmanta-core 13
 
