@@ -2,6 +2,8 @@
 
 ## v1.0.9 - ?
 
+- Fixed test compatibility with inmanta-core 13
+
 
 ## v1.0.8 - 2024-03-29
 
