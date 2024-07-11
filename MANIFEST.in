@@ -1,0 +1,5 @@
+include inmanta_plugins/postgresql/setup.cfg
+include inmanta_plugins/postgresql/py.typed
+recursive-include inmanta_plugins/postgresql/model *.cf
+graft inmanta_plugins/postgresql/files
+graft inmanta_plugins/postgresql/templates
