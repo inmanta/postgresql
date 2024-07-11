@@ -76,22 +76,24 @@ implementation postgresqlServer for PostgresqlServer:
                                         reload="/bin/true", # fix for https://github.com/inmanta/exec/issues/185
                                         command=exec::in_shell("sudo su -c '/usr/pgsql-{{ pg_version }}/bin/initdb /var/lib/pgsql/{{ pg_version }}/data' - postgres"),
                                         requires=self._packages)
-    postgresql_pg_hba_file = fs::File(host=self.host,
-                                    path="/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf",
-                                    mode=600,
-                                    owner="postgres",
-                                    group="postgres",
-                                    content=std::template('postgresql/pg_hba.conf.j2'),
-                                    requires=[postgresql_initdb_script],
-                                    reload=true)
-    postgresql_conf_file = fs::File(host=self.host,
-                                    path="/var/lib/pgsql/{{ pg_version }}/data/postgresql.conf",
-                                    mode=600,
-                                    owner="postgres",
-                                    group="postgres",
-                                    content=std::template('postgresql/postgresql.conf.j2'),
-                                    requires=[postgresql_initdb_script],
-                                    reload=true)
+    postgresql_pg_hba_file = fs::File(
+        host=self.host,
+        path="/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf",
+        mode=600,
+        owner="postgres",
+        group="postgres",
+        content=std::template('postgresql/pg_hba.conf.j2'),
+        requires=[postgresql_initdb_script],
+    )
+    postgresql_conf_file = fs::File(
+        host=self.host,
+        path="/var/lib/pgsql/{{ pg_version }}/data/postgresql.conf",
+        mode=600,
+        owner="postgres",
+        group="postgres",
+        content=std::template('postgresql/postgresql.conf.j2'),
+        requires=[postgresql_initdb_script],
+    )
     postgresql_service = systemd::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
                                     requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script], provides=self.provides)
 end
