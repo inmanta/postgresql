@@ -2,6 +2,8 @@ import postgresql
 import exec
 import yum
 import ssh
+import fs
+import systemd
 
 # The setup procedure is statefull!
 
@@ -54,7 +56,7 @@ implementation postgresqlMaster for Master:
                                         creates="/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf",
                                         command=exec::in_shell("sudo su -c '/usr/pgsql-{{ pg_version }}/bin/initdb /var/lib/pgsql/{{ pg_version }}/data' - postgres"),
                                         requires=self._packages)
-    postgresql_pg_hba_file = std::File(host=self.host,
+    postgresql_pg_hba_file = fs::File(host=self.host,
                                     path="/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf",
                                     mode=600,
                                     owner="postgres",
@@ -62,7 +64,7 @@ implementation postgresqlMaster for Master:
                                     content=std::template('postgresql/pg_hba_master.conf.j2'),
                                     requires=[postgresql_initdb_script],
                                     reload=true)
-    postgresql_conf_file = std::File(host=self.host,
+    postgresql_conf_file = fs::File(host=self.host,
                                     path="/var/lib/pgsql/{{ pg_version }}/data/postgresql.conf",
                                     mode=600,
                                     owner="postgres",
@@ -70,7 +72,7 @@ implementation postgresqlMaster for Master:
                                     content=std::template('postgresql/postgresql_master.conf.j2'),
                                     requires=[postgresql_initdb_script],
                                     reload=true)
-    postgresql_service = std::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
+    postgresql_service = systemd::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
                                     requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script])
 
     ReplicationSlot(
@@ -88,7 +90,7 @@ implementation postgresqlStandby for Standby:
                                         creates="/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf",
                                         command=exec::in_shell("sudo su -c '{{init_cmd}}' - postgres"),
                                         requires=[self._packages, self.master])
-    postgresql_pg_hba_file = std::File(host=self.host,
+    postgresql_pg_hba_file = fs::File(host=self.host,
                                     path="/var/lib/pgsql/{{ pg_version }}/data/recovery.conf",
                                     mode=600,
                                     owner="postgres",
@@ -97,7 +99,7 @@ implementation postgresqlStandby for Standby:
                                     requires=[postgresql_initdb_script],
                                     reload=true)
 
-    postgresql_service = std::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
+    postgresql_service = systemd::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
                                     requires=[postgresql_pg_hba_file])
 
 end

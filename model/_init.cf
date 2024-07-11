@@ -1,5 +1,7 @@
 import exec
 import yum
+import fs
+import systemd
 
 # for resource typing
 import postgresql::ha
@@ -51,8 +53,8 @@ implementation install for PostgresqlServer:
                                       baseurl="https://download.postgresql.org/pub/repos/yum/{{ pg_version }}/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL",
                                       requires=pre_install)
-    install_postgresql_package = std::Package(name="postgresql{{ pg_version }}-server", host=self.host, state="latest", requires=[postgresql_repo])
-    install_postgresql_contrib_package = std::Package(name="postgresql{{ pg_version }}-contrib", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package = yum::Package(name="postgresql{{ pg_version }}-server", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_contrib_package = yum::Package(name="postgresql{{ pg_version }}-contrib", host=self.host, state="latest", requires=[postgresql_repo])
     self._packages = [install_postgresql_package, install_postgresql_contrib_package]
 end
 
@@ -64,7 +66,7 @@ implementation install_tools for PostgresqlTools:
                                       baseurl="https://download.postgresql.org/pub/repos/yum/{{ pg_version }}/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL",
                                       requires=self.requires)
-    install_postgresql_package = std::Package(name="postgresql{{ pg_version }}", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package = yum::Package(name="postgresql{{ pg_version }}", host=self.host, state="latest", requires=[postgresql_repo])
     install_postgresql_package.provides = self.provides
 end
 
@@ -74,7 +76,7 @@ implementation postgresqlServer for PostgresqlServer:
                                         reload="/bin/true", # fix for https://github.com/inmanta/exec/issues/185
                                         command=exec::in_shell("sudo su -c '/usr/pgsql-{{ pg_version }}/bin/initdb /var/lib/pgsql/{{ pg_version }}/data' - postgres"),
                                         requires=self._packages)
-    postgresql_pg_hba_file = std::File(host=self.host,
+    postgresql_pg_hba_file = fs::File(host=self.host,
                                     path="/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf",
                                     mode=600,
                                     owner="postgres",
@@ -82,7 +84,7 @@ implementation postgresqlServer for PostgresqlServer:
                                     content=std::template('postgresql/pg_hba.conf.j2'),
                                     requires=[postgresql_initdb_script],
                                     reload=true)
-    postgresql_conf_file = std::File(host=self.host,
+    postgresql_conf_file = fs::File(host=self.host,
                                     path="/var/lib/pgsql/{{ pg_version }}/data/postgresql.conf",
                                     mode=600,
                                     owner="postgres",
@@ -90,7 +92,7 @@ implementation postgresqlServer for PostgresqlServer:
                                     content=std::template('postgresql/postgresql.conf.j2'),
                                     requires=[postgresql_initdb_script],
                                     reload=true)
-    postgresql_service = std::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
+    postgresql_service = systemd::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
                                     requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script], provides=self.provides)
 end
 
