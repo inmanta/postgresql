@@ -53,8 +53,8 @@ implementation install for PostgresqlServer:
                                       baseurl="https://download.postgresql.org/pub/repos/yum/{{ pg_version }}/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL",
                                       requires=pre_install)
-    install_postgresql_package = yum::Package(name="postgresql{{ pg_version }}-server", host=self.host, state="latest", requires=[postgresql_repo])
-    install_postgresql_contrib_package = yum::Package(name="postgresql{{ pg_version }}-contrib", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package = yum::Package(name="postgresql{{ pg_version }}-server", host=self.host, requires=[postgresql_repo])
+    install_postgresql_contrib_package = yum::Package(name="postgresql{{ pg_version }}-contrib", host=self.host, requires=[postgresql_repo])
     self._packages = [install_postgresql_package, install_postgresql_contrib_package]
 end
 
@@ -66,7 +66,7 @@ implementation install_tools for PostgresqlTools:
                                       baseurl="https://download.postgresql.org/pub/repos/yum/{{ pg_version }}/redhat/rhel-$releasever-$basearch",
                                       gpgkey="https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL",
                                       requires=self.requires)
-    install_postgresql_package = yum::Package(name="postgresql{{ pg_version }}", host=self.host, state="latest", requires=[postgresql_repo])
+    install_postgresql_package = yum::Package(name="postgresql{{ pg_version }}", host=self.host, requires=[postgresql_repo])
     install_postgresql_package.provides = self.provides
 end
 
@@ -94,7 +94,7 @@ implementation postgresqlServer for PostgresqlServer:
         content=std::template('postgresql/postgresql.conf.j2'),
         requires=[postgresql_initdb_script],
     )
-    postgresql_service = systemd::Service(name="postgresql-{{ pg_version }}", host=self.host, state="running", onboot=true,
+    postgresql_service = systemd::Service(name="postgresql-{{ pg_version }}", host=self.host, onboot=true,
                                     requires=[postgresql_conf_file, postgresql_pg_hba_file, postgresql_initdb_script], provides=self.provides)
 end
 
