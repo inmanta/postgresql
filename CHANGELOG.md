@@ -1,7 +1,8 @@
 # Changelog
 
-## v1.0.13 - ?
+## v1.1.0 - ?
 
+- Add support for Yum 2.0.0
 
 ## v1.0.12 - 2024-07-11
 
