@@ -1,8 +1,8 @@
 # Changelog
 
-## v1.1.0 - ?
+## v1.0.13 - ?
 
-- Add support for inmanta-module-yum 2.0.0
+- Add constraint for inmanta-module-yum
 
 ## v1.0.12 - 2024-07-11
 
